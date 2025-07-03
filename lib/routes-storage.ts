@@ -25,6 +25,8 @@ export interface Route {
     name: string
     avatar: string
     bike: string
+    hasPassenger?: boolean
+    passengerName?: string
   }>
   mapImage: string
 }
@@ -209,12 +211,27 @@ export const deleteRoute = (id: number): boolean => {
   return true
 }
 
-export const joinRoute = (routeId: number, participant: { name: string; avatar: string; bike: string }): boolean => {
+export const joinRoute = (routeId: number, participant: { 
+  name: string; 
+  avatar: string; 
+  bike: string;
+  hasPassenger?: boolean;
+  passengerName?: string;
+}): boolean => {
   const route = getRouteById(routeId)
-  if (!route || route.currentParticipants >= route.maxParticipants) return false
+  if (!route) return false
+  
+  // Calculate total participants including passengers
+  const currentTotal = route.participants.reduce((total, p) => {
+    return total + 1 + (p.hasPassenger ? 1 : 0)
+  }, 0)
+  
+  const newParticipantTotal = 1 + (participant.hasPassenger ? 1 : 0)
+  
+  if (currentTotal + newParticipantTotal > route.maxParticipants) return false
   
   const updatedRoute = updateRoute(routeId, {
-    currentParticipants: route.currentParticipants + 1,
+    currentParticipants: route.currentParticipants + newParticipantTotal,
     participants: [...route.participants, participant]
   })
   
@@ -225,8 +242,13 @@ export const leaveRoute = (routeId: number, participantName: string): boolean =>
   const route = getRouteById(routeId)
   if (!route || route.currentParticipants <= 0) return false
   
+  const participant = route.participants.find(p => p.name === participantName)
+  if (!participant) return false
+  
+  const participantTotal = 1 + (participant.hasPassenger ? 1 : 0)
+  
   const updatedRoute = updateRoute(routeId, {
-    currentParticipants: route.currentParticipants - 1,
+    currentParticipants: route.currentParticipants - participantTotal,
     participants: route.participants.filter(p => p.name !== participantName)
   })
   
