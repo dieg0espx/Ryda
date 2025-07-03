@@ -154,17 +154,19 @@ export default function RoutesPage() {
               <h1 className="text-3xl font-bold mb-2 text-black dark:text-white">{t("routes")}</h1>
               <p className="text-gray-600 dark:text-gray-400">{t("discover_scenic_routes")}</p>
             </div>
+          </div>
+          <div className="flex justify-end">
             <CreateRouteForm onRouteCreated={loadRoutes} />
           </div>
         </div>
 
         {/* Route Filter Toggle */}
         <div className="mb-6">
-          <div className="flex items-center justify-center">
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-full max-w-xs">
+          <div className="w-full">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-full">
               <button
                 onClick={() => setFilterType("all")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex-1 ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors w-1/2 ${
                   filterType === "all"
                     ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm"
                     : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
@@ -174,7 +176,7 @@ export default function RoutesPage() {
               </button>
               <button
                 onClick={() => setFilterType("my")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex-1 ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors w-1/2 ${
                   filterType === "my"
                     ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm"
                     : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
