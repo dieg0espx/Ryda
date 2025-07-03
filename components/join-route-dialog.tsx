@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Bike, User } from "lucide-react"
+import { userMotorcycles } from "@/lib/static-data"
 
 interface JoinRouteDialogProps {
   open: boolean
@@ -15,35 +16,6 @@ interface JoinRouteDialogProps {
   onJoin: (data: { bike: string; hasPassenger: boolean; passengerName?: string }) => void
   loading?: boolean
 }
-
-const popularBikes = [
-  "Harley Davidson",
-  "BMW R1250GS",
-  "Yamaha MT-07",
-  "Honda CB650R",
-  "Kawasaki Ninja",
-  "Ducati Monster",
-  "Triumph Street Triple",
-  "Suzuki GSX-R",
-  "Indian Scout",
-  "Aprilia RSV4",
-  "Yamaha R1",
-  "Ducati Panigale",
-  "Honda CBR1000RR",
-  "Kawasaki ZX-10R",
-  "BMW S1000RR",
-  "Honda Rebel",
-  "Yamaha Bolt",
-  "Kawasaki Vulcan",
-  "Suzuki Boulevard",
-  "Victory Octane",
-  "BMW R18",
-  "Triumph Bonneville",
-  "Moto Guzzi V7",
-  "Royal Enfield",
-  "Harley Iron 883",
-  "Other"
-]
 
 export default function JoinRouteDialog({ open, onOpenChange, onJoin, loading }: JoinRouteDialogProps) {
   const [bike, setBike] = useState("")
@@ -75,6 +47,16 @@ export default function JoinRouteDialog({ open, onOpenChange, onJoin, loading }:
     onOpenChange(newOpen)
   }
 
+  // Get user's motorcycles from profile
+  const userBikes = userMotorcycles.map(motorcycle => ({
+    id: motorcycle.id,
+    name: `${motorcycle.brand} ${motorcycle.model} (${motorcycle.year})`,
+    value: `${motorcycle.brand} ${motorcycle.model}`
+  }))
+
+  // Add "Other" option
+  const bikeOptions = [...userBikes, { id: "other", name: "Other", value: "Other" }]
+
   if (!open) return null
 
   return (
@@ -94,9 +76,9 @@ export default function JoinRouteDialog({ open, onOpenChange, onJoin, loading }:
                 <SelectValue placeholder="Select your motorcycle" />
               </SelectTrigger>
               <SelectContent>
-                {popularBikes.map((bikeName) => (
-                  <SelectItem key={bikeName} value={bikeName}>
-                    {bikeName}
+                {bikeOptions.map((bikeOption) => (
+                  <SelectItem key={bikeOption.id} value={bikeOption.value}>
+                    {bikeOption.name}
                   </SelectItem>
                 ))}
               </SelectContent>
