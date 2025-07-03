@@ -9,6 +9,7 @@ import AuthWrapper from "@/components/auth-wrapper"
 import Navigation from "@/components/navigation"
 import PWAInstaller from "@/components/pwa-installer"
 import TestUserInitializer from "@/components/test-user-initializer"
+import ThemeStatusBar from "@/components/theme-status-bar"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'Ryda'
   },
   formatDetection: {
@@ -53,7 +54,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Ryda" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#000000" />
@@ -67,6 +68,7 @@ export default function RootLayout({
         <PWAInstaller />
         <TestUserInitializer />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ThemeStatusBar />
           <AuthProvider>
             <LanguageProvider>
               <AuthWrapper>
