@@ -420,7 +420,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
           <Plus className="w-4 h-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto z-[200]">
         <DialogHeader>
           <div className="space-y-2">
             <DialogTitle>{steps[currentStep - 1].title}</DialogTitle>
