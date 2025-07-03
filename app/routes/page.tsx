@@ -127,11 +127,11 @@ export default function RoutesPage() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case "beginner":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
       case "intermediate":
         return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
       case "advanced":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
     }
@@ -148,21 +148,21 @@ export default function RoutesPage() {
         {routes.map((route) => (
           <Card
             key={route.id}
-            className="group cursor-pointer hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-600 bg-white dark:bg-gray-900 overflow-hidden"
+            className="group cursor-pointer hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-600  overflow-hidden"
             onClick={() => setSelectedRoute(route)}
           >
             {/* Route Image */}
-            <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="relative h-48 ">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent border-b border-gray-200 dark:border-gray-800" />
               <div className="absolute top-4 left-4">
                 <Badge className={`${getDifficultyColor(route.difficulty)} font-semibold`}>
                   {route.difficulty}
                 </Badge>
               </div>
-              <div className="absolute top-4 right-4 flex items-center space-x-1 bg-white/90 dark:bg-gray-900/90 px-2 py-1 rounded-full">
+              {/* <div className="absolute top-4 right-4 flex items-center space-x-1 bg-white/90 dark:bg-gray-900/90 px-2 py-1 rounded-full">
                 <Star className="w-4 h-4 fill-orange-500 text-orange-500" />
                 <span className="text-sm font-medium text-black dark:text-white">{route.rating}</span>
-              </div>
+              </div> */}
               <div className="absolute bottom-4 left-4 right-4">
                 <h3 className="text-lg font-bold text-white mb-1">{route.title}</h3>
                 <p className="text-sm text-white/90 line-clamp-2">{route.description}</p>
@@ -248,10 +248,10 @@ export default function RoutesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 md:space-x-3 mb-2">
                       <Badge className={getDifficultyColor(selectedRoute.difficulty)}>{selectedRoute.difficulty}</Badge>
-                      <div className="flex items-center space-x-1">
+                      {/* <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 fill-orange-500 text-orange-500" />
                         <span className="font-medium text-black dark:text-white">{selectedRoute.rating}</span>
-                      </div>
+                      </div> */}
                     </div>
                     <h2 className="text-lg md:text-xl lg:text-2xl mb-2 text-black dark:text-white font-bold truncate">{selectedRoute.title}</h2>
                     <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base line-clamp-2">{selectedRoute.description}</p>
@@ -271,7 +271,7 @@ export default function RoutesPage() {
               <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 pt-4 pb-20 md:pb-6 mb-[130px]">
                 <div className="space-y-4 md:space-y-6">
                   {/* Creator Info */}
-                  <div className="flex items-center space-x-3 md:space-x-4 p-3 md:p-4 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg">
+                  <div className="flex items-center space-x-3 md:space-x-4 p-3 md:p-4 border border-gray-200 dark:border-gray-800 backdrop-blur-sm rounded-lg">
                     <Avatar className="w-10 h-10 md:w-12 md:h-12">
                       <AvatarImage src={selectedRoute.creator.avatar || "/placeholder.svg"} />
                       <AvatarFallback className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
@@ -401,7 +401,7 @@ export default function RoutesPage() {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                       {selectedRoute.participants.map((participant, index) => (
-                        <div key={index} className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg">
+                        <div key={index} className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 border border-gray-200 dark:border-gray-800 backdrop-blur-sm rounded-lg">
                           <Avatar className="w-6 h-6 md:w-8 md:h-8 flex-shrink-0">
                             <AvatarImage src={participant.avatar || "/placeholder.svg"} />
                             <AvatarFallback className="text-xs bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">

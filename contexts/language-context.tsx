@@ -23,6 +23,7 @@ const translations = {
     settings: "Settings",
 
     // Routes
+    discover_scenic_routes: "Discover scenic routes and plan your next adventure",
     discoverAndShareRoutes: "Discover and share amazing motorcycle routes",
     createRoute: "Create Route",
     createNewRoute: "Create New Route",
@@ -103,6 +104,7 @@ const translations = {
     settings: "Configuración",
 
     // Routes
+    discover_scenic_routes: "Descubre rutas escénicas y planifica tu próxima aventura",
     discoverAndShareRoutes: "Descubre y comparte increíbles rutas de motocicleta",
     createRoute: "Crear Ruta",
     createNewRoute: "Crear Nueva Ruta",
