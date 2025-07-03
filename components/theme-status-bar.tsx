@@ -8,7 +8,7 @@ export default function ThemeStatusBar() {
 
   useEffect(() => {
     // Update the status bar style based on the theme
-    const statusBarStyle = resolvedTheme === 'dark' ? 'white-translucent' : 'black-translucent'
+    const statusBarStyle = resolvedTheme === 'dark' ? 'white' : 'black'
     
     // Find and update the existing meta tag
     let metaTag = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
