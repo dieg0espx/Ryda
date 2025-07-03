@@ -21,6 +21,7 @@ export default function RoutesPage() {
   const [joinDialogOpen, setJoinDialogOpen] = useState(false)
   const [joiningRouteId, setJoiningRouteId] = useState<number | null>(null)
   const [joinLoading, setJoinLoading] = useState(false)
+  const [filterType, setFilterType] = useState<"all" | "my">("all")
 
   // Load routes on component mount
   useEffect(() => {
@@ -48,6 +49,13 @@ export default function RoutesPage() {
       }
     }
   }, [routes, selectedRoute])
+
+  // Filter routes based on selection
+  const filteredRoutes = routes.filter(route => {
+    if (filterType === "all") return true
+    if (filterType === "my") return isUserInRoute(route)
+    return true
+  })
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -150,15 +158,50 @@ export default function RoutesPage() {
           </div>
         </div>
 
-        {routes.length === 0 ? (
+        {/* Route Filter Toggle */}
+        <div className="mb-6">
+          <div className="flex items-center justify-center">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <button
+                onClick={() => setFilterType("all")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  filterType === "all"
+                    ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                }`}
+              >
+                All Routes
+              </button>
+              <button
+                onClick={() => setFilterType("my")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  filterType === "my"
+                    ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                }`}
+              >
+                My Routes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {filteredRoutes.length === 0 ? (
           <div className="text-center py-12">
             <RouteIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No routes available</h3>
-            <p className="text-gray-600 dark:text-gray-400">Check back later for new routes!</p>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              {filterType === "all" ? "No routes available" : "No routes joined"}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              {filterType === "all" 
+                ? "Check back later for new routes!" 
+                : "Join some routes to see them here!"
+              }
+            </p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {routes.map((route) => {
+            {filteredRoutes.map((route) => {
               const userParticipant = getUserParticipantInfo(route)
               const isInRoute = isUserInRoute(route)
               

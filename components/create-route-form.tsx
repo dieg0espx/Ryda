@@ -124,9 +124,8 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Route
+        <Button size="icon" className="bg-orange-500 hover:bg-orange-600 text-white">
+          <Plus className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
