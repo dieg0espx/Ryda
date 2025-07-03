@@ -148,7 +148,7 @@ export default function RoutesPage() {
   return (
     <>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+        <div className="mb-8 flex">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
               <h1 className="text-3xl font-bold mb-2 text-black dark:text-white">{t("routes")}</h1>
@@ -163,13 +163,13 @@ export default function RoutesPage() {
         {/* Route Filter Toggle */}
         <div className="mb-6">
           <div className="w-full">
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-full">
+            <div className="bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 w-full">
               <button
                 onClick={() => setFilterType("all")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors w-1/2 ${
                   filterType === "all"
-                    ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                    ? "bg-white dark:bg-neutral-700 text-black dark:text-white shadow-sm"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
                 }`}
               >
                 All Routes
