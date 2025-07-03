@@ -40,6 +40,14 @@ export default function RoutesPage() {
     }
   }
 
+  const isUserInRoute = (route: Route) => {
+    return route.participants.some(p => p.name === "Test User")
+  }
+
+  const getUserParticipantInfo = (route: Route) => {
+    return route.participants.find(p => p.name === "Test User")
+  }
+
   // Refresh routes when selected route changes
   useEffect(() => {
     if (selectedRoute) {
@@ -122,14 +130,6 @@ export default function RoutesPage() {
       console.error('Error leaving route:', error)
       toast.error('Failed to leave route')
     }
-  }
-
-  const isUserInRoute = (route: Route) => {
-    return route.participants.some(p => p.name === "Test User")
-  }
-
-  const getUserParticipantInfo = (route: Route) => {
-    return route.participants.find(p => p.name === "Test User")
   }
 
   if (loading) {
