@@ -358,29 +358,29 @@ export default function MarketplacePage() {
 
       {/* Tab Toggle */}
       <div className="mb-6">
-        <div className="flex bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 w-fit">
-          <Button
-            variant={activeTab === "marketplace" ? "default" : "ghost"}
-            onClick={() => handleTabChange("marketplace")}
-            className={`px-6 py-2 rounded-md transition-all duration-200 ${
-              activeTab === "marketplace" 
-                ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-sm" 
-                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-            }`}
-          >
-            Marketplace
-          </Button>
-          <Button
-            variant={activeTab === "services" ? "default" : "ghost"}
-            onClick={() => handleTabChange("services")}
-            className={`px-6 py-2 rounded-md transition-all duration-200 ${
-              activeTab === "services" 
-                ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-sm" 
-                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-            }`}
-          >
-            Services
-          </Button>
+        <div className="w-full">
+          <div className="bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 w-full">
+            <button
+              onClick={() => handleTabChange("marketplace")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors w-1/2 ${
+                activeTab === "marketplace"
+                  ? "bg-white dark:bg-neutral-700 text-black dark:text-white shadow-sm"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+              }`}
+            >
+              Marketplace
+            </button>
+            <button
+              onClick={() => handleTabChange("services")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors w-1/2 ${
+                activeTab === "services"
+                  ? "bg-white dark:bg-neutral-700 text-black dark:text-white shadow-sm"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+              }`}
+            >
+              Services
+            </button>
+          </div>
         </div>
       </div>
 

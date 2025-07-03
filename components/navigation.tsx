@@ -19,7 +19,7 @@ const navItems = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/groups", icon: Users, label: "Groups" },
   { href: "/routes", icon: MapPin, label: "Routes" },
-  { href: "/marketplace", icon: ShoppingBag, label: "Marketplace" },
+  { href: "/marketplace", icon: ShoppingBag, label: "Market" },
 ]
 
 export default function Navigation() {
