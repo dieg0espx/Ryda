@@ -36,7 +36,7 @@ export default function Navigation() {
   return (
     <>
       {/* Desktop Navigation - Fixed Top */}
-      <nav className="hidden md:flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed top-0 left-0 right-0 z-50">
+      <nav className="hidden md:flex items-center justify-between p-4 border-b bg-background fixed top-0 left-0 right-0 z-50">
         <div className="flex items-center space-x-8">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">

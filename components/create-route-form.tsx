@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Plus, X, ChevronLeft, ChevronRight } from "lucide-react"
 import { createRoute } from "@/lib/routes-storage"
 import { toast } from "sonner"
@@ -19,27 +20,17 @@ const steps = [
   {
     id: 1,
     title: "Basic Information",
-    description: "Let's start with the basics"
+    description: "Route details and description"
   },
   {
     id: 2,
     title: "Route Details",
-    description: "Tell us about the route"
+    description: "Location, timing, and participants"
   },
   {
     id: 3,
-    title: "Location & Time",
-    description: "Where and when"
-  },
-  {
-    id: 4,
-    title: "Highlights & Requirements",
-    description: "What to expect"
-  },
-  {
-    id: 5,
     title: "Review & Create",
-    description: "Final step"
+    description: "Final review and creation"
   }
 ]
 
@@ -47,6 +38,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
+  const [noMaxParticipants, setNoMaxParticipants] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -70,6 +62,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
     try {
       const newRoute = createRoute({
         ...formData,
+        maxParticipants: noMaxParticipants ? -1 : formData.maxParticipants,
         currentParticipants: 0,
         rating: 0,
         creator: {
@@ -110,6 +103,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
       highlights: [""],
       requirements: [""],
     })
+    setNoMaxParticipants(false)
     setCurrentStep(1)
   }
 
@@ -171,49 +165,49 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="title">Route Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Enter a catchy title for your route"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Describe what makes this route special"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="difficulty">Difficulty Level</Label>
-              <Select value={formData.difficulty} onValueChange={(value: "Beginner" | "Intermediate" | "Advanced") => setFormData(prev => ({ ...prev, difficulty: value }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Beginner">Beginner</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        )
-
-      case 2:
-        return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            {/* Basic Route Info */}
+            <div className="space-y-4">
               <div>
-                <Label htmlFor="distance">Distance</Label>
+                <Label htmlFor="title">Route Title *</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter a catchy title for your route"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe what makes this route special"
+                  rows={3}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Route Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="difficulty">Difficulty Level *</Label>
+                <Select value={formData.difficulty} onValueChange={(value: "Beginner" | "Intermediate" | "Advanced") => setFormData(prev => ({ ...prev, difficulty: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="distance">Distance *</Label>
                 <Input
                   id="distance"
                   value={formData.distance}
@@ -223,7 +217,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                 />
               </div>
               <div>
-                <Label htmlFor="duration">Duration</Label>
+                <Label htmlFor="duration">Duration *</Label>
                 <Input
                   id="duration"
                   value={formData.duration}
@@ -233,9 +227,11 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                 />
               </div>
             </div>
+
+            {/* Route Locations */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="startLocation">Start Location</Label>
+                <Label htmlFor="startLocation">Start Location *</Label>
                 <Input
                   id="startLocation"
                   value={formData.startLocation}
@@ -245,7 +241,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                 />
               </div>
               <div>
-                <Label htmlFor="endLocation">End Location</Label>
+                <Label htmlFor="endLocation">End Location *</Label>
                 <Input
                   id="endLocation"
                   value={formData.endLocation}
@@ -258,12 +254,13 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
           </div>
         )
 
-      case 3:
+      case 2:
         return (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-6">
+            {/* Timing and Participants */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date">Date *</Label>
                 <Input
                   id="date"
                   type="date"
@@ -273,7 +270,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                 />
               </div>
               <div>
-                <Label htmlFor="time">Time</Label>
+                <Label htmlFor="time">Time *</Label>
                 <Input
                   id="time"
                   type="time"
@@ -282,20 +279,10 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   required
                 />
               </div>
-              <div>
-                <Label htmlFor="maxParticipants">Max Participants</Label>
-                <Input
-                  id="maxParticipants"
-                  type="number"
-                  min="1"
-                  value={formData.maxParticipants}
-                  onChange={(e) => setFormData(prev => ({ ...prev, maxParticipants: parseInt(e.target.value) || 1 }))}
-                  required
-                />
-              </div>
             </div>
+
             <div>
-              <Label htmlFor="meetingPoint">Meeting Point</Label>
+              <Label htmlFor="meetingPoint">Meeting Point *</Label>
               <Input
                 id="meetingPoint"
                 value={formData.meetingPoint}
@@ -304,101 +291,168 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                 required
               />
             </div>
+
+            {/* Participants Section */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="noMaxParticipants"
+                  checked={noMaxParticipants}
+                  onCheckedChange={(checked) => setNoMaxParticipants(checked as boolean)}
+                />
+                <Label htmlFor="noMaxParticipants" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  No maximum participants limit
+                </Label>
+              </div>
+              
+              {!noMaxParticipants && (
+                <div>
+                  <Label htmlFor="maxParticipants">Maximum Participants *</Label>
+                  <Input
+                    id="maxParticipants"
+                    type="number"
+                    min="1"
+                    value={formData.maxParticipants}
+                    onChange={(e) => setFormData(prev => ({ ...prev, maxParticipants: parseInt(e.target.value) || 1 }))}
+                    required
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Highlights and Requirements */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label>Highlights</Label>
+                <div className="space-y-2">
+                  {formData.highlights.map((highlight, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={highlight}
+                        onChange={(e) => updateHighlight(index, e.target.value)}
+                        placeholder="Route highlight"
+                      />
+                      {formData.highlights.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeHighlight(index)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" onClick={addHighlight} className="w-full">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Highlight
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <Label>Requirements</Label>
+                <div className="space-y-2">
+                  {formData.requirements.map((requirement, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={requirement}
+                        onChange={(e) => updateRequirement(index, e.target.value)}
+                        placeholder="Route requirement"
+                      />
+                      {formData.requirements.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeRequirement(index)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" onClick={addRequirement} className="w-full">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Requirement
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         )
 
-      case 4:
+      case 3:
         return (
           <div className="space-y-6">
-            <div>
-              <Label>Highlights</Label>
-              <div className="space-y-2">
-                {formData.highlights.map((highlight, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={highlight}
-                      onChange={(e) => updateHighlight(index, e.target.value)}
-                      placeholder="Route highlight"
-                    />
-                    {formData.highlights.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeHighlight(index)}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    )}
+            <div className="bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-xl p-6 space-y-4">
+              <div className="text-center">
+                <h3 className="font-bold text-xl text-neutral-900 dark:text-white">{formData.title}</h3>
+                <p className="text-neutral-700 dark:text-white mt-2">{formData.description}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="text-center p-3 bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-lg">
+                  <div className="font-semibold text-neutral-900 dark:text-white">Difficulty</div>
+                  <div className="text-neutral-700 dark:text-white">{formData.difficulty}</div>
+                </div>
+                <div className="text-center p-3 bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-lg">
+                  <div className="font-semibold text-neutral-900 dark:text-white">Distance</div>
+                  <div className="text-neutral-700 dark:text-white">{formData.distance}</div>
+                </div>
+                <div className="text-center p-3 bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-lg">
+                  <div className="font-semibold text-neutral-900 dark:text-white">Duration</div>
+                  <div className="text-neutral-700 dark:text-white">{formData.duration}</div>
+                </div>
+                <div className="text-center p-3 bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-lg">
+                  <div className="font-semibold text-neutral-900 dark:text-white">Max Riders</div>
+                  <div className="text-neutral-700 dark:text-white">
+                    {noMaxParticipants ? "No limit" : formData.maxParticipants}
                   </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addHighlight} className="w-full">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Highlight
-                </Button>
+                </div>
               </div>
-            </div>
+              
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-2 p-3 bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-lg">
+                  <span className="font-semibold text-neutral-900 dark:text-white">Route:</span>
+                  <span className="text-neutral-700 dark:text-white">{formData.startLocation} → {formData.endLocation}</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-lg">
+                  <span className="font-semibold text-neutral-900 dark:text-white">Date & Time:</span>
+                  <span className="text-neutral-700 dark:text-white">{formData.date} at {formData.time}</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-white dark:bg-black border border-neutral-300 dark:border-white rounded-lg">
+                  <span className="font-semibold text-neutral-900 dark:text-white">Meeting Point:</span>
+                  <span className="text-neutral-700 dark:text-white">{formData.meetingPoint}</span>
+                </div>
+              </div>
 
-            <div>
-              <Label>Requirements</Label>
-              <div className="space-y-2">
-                {formData.requirements.map((requirement, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={requirement}
-                      onChange={(e) => updateRequirement(index, e.target.value)}
-                      placeholder="Route requirement"
-                    />
-                    {formData.requirements.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeRequirement(index)}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    )}
+              {formData.highlights.filter(h => h.trim()).length > 0 && (
+                <div>
+                  <div className="font-semibold text-neutral-900 dark:text-white mb-2">Highlights:</div>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.highlights.filter(h => h.trim()).map((highlight, index) => (
+                      <span key={index} className="px-3 py-1 bg-white dark:bg-black border border-neutral-300 dark:border-white text-neutral-700 dark:text-white rounded-full text-sm">
+                        {highlight}
+                      </span>
+                    ))}
                   </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addRequirement} className="w-full">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Requirement
-                </Button>
-              </div>
-            </div>
-          </div>
-        )
+                </div>
+              )}
 
-      case 5:
-        return (
-          <div className="space-y-4">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
-              <h3 className="font-semibold text-lg">{formData.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400">{formData.description}</p>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              {formData.requirements.filter(r => r.trim()).length > 0 && (
                 <div>
-                  <span className="font-medium">Difficulty:</span> {formData.difficulty}
+                  <div className="font-semibold text-neutral-900 dark:text-white mb-2">Requirements:</div>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.requirements.filter(r => r.trim()).map((requirement, index) => (
+                      <span key={index} className="px-3 py-1 bg-white dark:bg-black border border-neutral-300 dark:border-white text-neutral-700 dark:text-white rounded-full text-sm">
+                        {requirement}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <span className="font-medium">Distance:</span> {formData.distance}
-                </div>
-                <div>
-                  <span className="font-medium">Duration:</span> {formData.duration}
-                </div>
-                <div>
-                  <span className="font-medium">Max Participants:</span> {formData.maxParticipants}
-                </div>
-              </div>
-              <div className="text-sm">
-                <span className="font-medium">Route:</span> {formData.startLocation} → {formData.endLocation}
-              </div>
-              <div className="text-sm">
-                <span className="font-medium">Date & Time:</span> {formData.date} at {formData.time}
-              </div>
-              <div className="text-sm">
-                <span className="font-medium">Meeting Point:</span> {formData.meetingPoint}
-              </div>
+              )}
             </div>
           </div>
         )
@@ -416,37 +470,37 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
       }
     }}>
       <DialogTrigger asChild>
-        <Button size="icon" className="text-orange-500" variant="outline">
+        <Button size="icon" className="text-neutral-700 dark:text-white" variant="outline">
           <Plus className="w-4 h-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="!fixed !inset-x-0 !top-0 !bottom-[80px] !w-full !h-[calc(100vh-80px)] !max-w-none !max-h-none !rounded-none !p-0 !left-0 !transform-none bg-white dark:bg-black backdrop-blur-md border-0 md:!max-w-2xl md:!max-h-[90vh] md:!inset-auto md:!top-1/2 md:!left-1/2 md:!transform md:!-translate-x-1/2 md:!-translate-y-1/2 md:rounded-lg">
-        <DialogHeader className="flex-shrink-0 p-4 md:p-6 pb-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
+      <DialogContent className="!fixed !inset-x-0 !top-0 !w-full !h-full !max-w-none !max-h-none !rounded-none !p-0 !left-0 !transform-none bg-white dark:bg-black backdrop-blur-md border-0 md:!max-w-3xl md:!max-h-[90vh] md:!inset-auto md:!top-1/2 md:!left-1/2 md:!transform md:!-translate-x-1/2 md:!-translate-y-1/2 md:rounded-lg">
+        <DialogHeader className="flex-shrink-0 p-4 md:p-6 pb-4 border-b border-neutral-300 dark:border-white bg-white/80 dark:bg-black/80 backdrop-blur-sm">
           <div className="space-y-2">
-            <DialogTitle>{steps[currentStep - 1].title}</DialogTitle>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{steps[currentStep - 1].description}</p>
+            <DialogTitle className="text-xl text-neutral-900 dark:text-white">{steps[currentStep - 1].title}</DialogTitle>
+            <p className="text-sm text-neutral-600 dark:text-white">{steps[currentStep - 1].description}</p>
           </div>
           
           {/* Progress Bar */}
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-4">
+          <div className="w-full rounded-full h-3 mt-4">
             <div 
-              className="bg-orange-500 h-2 rounded-full transition-all duration-300"
+              className="bg-neutral-800 dark:bg-white h-1 rounded-full transition-all duration-300"
               style={{ width: `${(currentStep / steps.length) * 100}%` }}
             />
           </div>
           
           {/* Step Indicators */}
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <div className="flex justify-between text-xs text-neutral-600 dark:text-white mt-3">
             {steps.map((step, index) => (
               <div key={step.id} className="flex flex-col items-center">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
                   index + 1 <= currentStep 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-gray-200 dark:bg-gray-700'
+                    ? 'bg-neutral-800 dark:bg-white text-white dark:text-neutral-900 shadow-lg' 
+                    : 'bg-white dark:bg-black border border-neutral-300 dark:border-white'
                 }`}>
                   {index + 1}
                 </div>
-                <span className="mt-1 hidden sm:block">{step.title}</span>
+                <span className="mt-2 hidden sm:block text-center max-w-20">{step.title}</span>
               </div>
             ))}
           </div>
@@ -459,7 +513,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
         </form>
 
         {/* Fixed Footer */}
-        <div className="fixed bottom-[80px] left-0 right-0 p-4 pb-4 md:p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-black/80 backdrop-blur-sm md:relative md:flex-shrink-0 md:bottom-0">
+        <div className="fixed bottom-[100px] left-0 right-0 p-4 pb-4 md:p-6 pt-4 border-t border-neutral-300 dark:border-white bg-white/80 dark:bg-black/80 backdrop-blur-sm md:relative md:flex-shrink-0 md:bottom-0">
           <div className="flex justify-between">
             <Button
               type="button"
@@ -476,13 +530,13 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
               <Button
                 type="button"
                 onClick={nextStep}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-neutral-800 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-700 dark:hover:bg-neutral-100"
               >
                 Next
                 <ChevronRight className="w-4 h-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={loading} className="flex items-center gap-2">
+              <Button type="submit" disabled={loading} className="flex items-center gap-2 bg-neutral-800 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-700 dark:hover:bg-neutral-100">
                 {loading ? "Creating..." : "Create Route"}
               </Button>
             )}
