@@ -420,7 +420,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
           <Plus className="w-4 h-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="!fixed !inset-0 !w-full !h-full !max-w-none !max-h-none !rounded-none !p-0 !left-0 !top-0 !transform-none bg-white/95 dark:bg-black backdrop-blur-md border-0 md:!max-w-2xl md:!max-h-[90vh] md:!inset-auto md:!top-1/2 md:!left-1/2 md:!transform md:!-translate-x-1/2 md:!-translate-y-1/2 md:rounded-lg">
+      <DialogContent className="!fixed !inset-x-0 !top-0 !bottom-[80px] !w-full !h-[calc(100vh-80px)] !max-w-none !max-h-none !rounded-none !p-0 !left-0 !transform-none bg-white dark:bg-black backdrop-blur-md border-0 md:!max-w-2xl md:!max-h-[90vh] md:!inset-auto md:!top-1/2 md:!left-1/2 md:!transform md:!-translate-x-1/2 md:!-translate-y-1/2 md:rounded-lg">
         <DialogHeader className="flex-shrink-0 p-4 md:p-6 pb-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
           <div className="space-y-2">
             <DialogTitle>{steps[currentStep - 1].title}</DialogTitle>
@@ -459,7 +459,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
         </form>
 
         {/* Fixed Footer */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 pb-[110px] md:p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-black/80 backdrop-blur-sm md:relative md:flex-shrink-0">
+        <div className="fixed bottom-[80px] left-0 right-0 p-4 pb-4 md:p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-black/80 backdrop-blur-sm md:relative md:flex-shrink-0 md:bottom-0">
           <div className="flex justify-between">
             <Button
               type="button"
