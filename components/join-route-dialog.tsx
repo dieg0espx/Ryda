@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Motorcycle, User } from "lucide-react"
+import { Bike, User } from "lucide-react"
 
 interface JoinRouteDialogProps {
   open: boolean
@@ -51,6 +51,16 @@ export default function JoinRouteDialog({ open, onOpenChange, onJoin, loading }:
   const [hasPassenger, setHasPassenger] = useState(false)
   const [passengerName, setPassengerName] = useState("")
 
+  // Reset form when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setBike("")
+      setCustomBike("")
+      setHasPassenger(false)
+      setPassengerName("")
+    }
+  }, [open])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const selectedBike = bike === "Other" ? customBike : bike
@@ -62,22 +72,17 @@ export default function JoinRouteDialog({ open, onOpenChange, onJoin, loading }:
   }
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      // Reset form when closing
-      setBike("")
-      setCustomBike("")
-      setHasPassenger(false)
-      setPassengerName("")
-    }
     onOpenChange(newOpen)
   }
+
+  if (!open) return null
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Motorcycle className="w-5 h-5" />
+            <Bike className="w-5 h-5" />
             Join Route
           </DialogTitle>
         </DialogHeader>
