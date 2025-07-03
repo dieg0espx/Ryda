@@ -344,7 +344,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                       )}
                     </div>
                   ))}
-                  <Button type="button" variant="outline" onClick={addHighlight} className="w-full">
+                  <Button type="button" variant="outline" onClick={addHighlight} className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-950">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Highlight
                   </Button>
@@ -373,7 +373,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                       )}
                     </div>
                   ))}
-                  <Button type="button" variant="outline" onClick={addRequirement} className="w-full">
+                  <Button type="button" variant="outline" onClick={addRequirement} className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-950">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Requirement
                   </Button>
@@ -433,7 +433,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   <div className="font-semibold text-neutral-900 dark:text-white mb-2">Highlights:</div>
                   <div className="flex flex-wrap gap-2">
                     {formData.highlights.filter(h => h.trim()).map((highlight, index) => (
-                      <span key={index} className="px-3 py-1 bg-white dark:bg-black border border-neutral-300 dark:border-white text-neutral-700 dark:text-white rounded-full text-sm">
+                      <span key={index} className="px-3 py-1 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 rounded-full text-sm">
                         {highlight}
                       </span>
                     ))}
@@ -446,7 +446,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   <div className="font-semibold text-neutral-900 dark:text-white mb-2">Requirements:</div>
                   <div className="flex flex-wrap gap-2">
                     {formData.requirements.filter(r => r.trim()).map((requirement, index) => (
-                      <span key={index} className="px-3 py-1 bg-white dark:bg-black border border-neutral-300 dark:border-white text-neutral-700 dark:text-white rounded-full text-sm">
+                      <span key={index} className="px-3 py-1 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 rounded-full text-sm">
                         {requirement}
                       </span>
                     ))}
@@ -470,7 +470,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
       }
     }}>
       <DialogTrigger asChild>
-        <Button size="icon" className="text-neutral-700 dark:text-white" variant="outline">
+        <Button size="icon" className="text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950" variant="outline">
           <Plus className="w-4 h-4" />
         </Button>
       </DialogTrigger>
@@ -484,7 +484,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
           {/* Progress Bar */}
           <div className="w-full rounded-full h-3 mt-4">
             <div 
-              className="bg-neutral-800 dark:bg-white h-1 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 h-1 rounded-full transition-all duration-300"
               style={{ width: `${(currentStep / steps.length) * 100}%` }}
             />
           </div>
@@ -495,7 +495,7 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
               <div key={step.id} className="flex flex-col items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
                   index + 1 <= currentStep 
-                    ? 'bg-neutral-800 dark:bg-white text-white dark:text-neutral-900 shadow-lg' 
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg' 
                     : 'bg-white dark:bg-black border border-neutral-300 dark:border-white'
                 }`}>
                   {index + 1}
@@ -530,13 +530,13 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
               <Button
                 type="button"
                 onClick={nextStep}
-                className="flex items-center gap-2 bg-neutral-800 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-700 dark:hover:bg-neutral-100"
+                className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
               >
                 Next
                 <ChevronRight className="w-4 h-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={loading} className="flex items-center gap-2 bg-neutral-800 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-700 dark:hover:bg-neutral-100">
+              <Button type="submit" disabled={loading} className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white">
                 {loading ? "Creating..." : "Create Route"}
               </Button>
             )}

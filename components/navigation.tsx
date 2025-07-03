@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Home, Users, MapPin, ShoppingBag, Wrench, Settings, LogOut, User } from "lucide-react"
+import { Home, Users, MapPin, ShoppingBag, Settings, LogOut, User } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useLanguage } from "@/contexts/language-context"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -20,7 +20,6 @@ const navItems = [
   { href: "/groups", icon: Users, label: "Groups" },
   { href: "/routes", icon: MapPin, label: "Routes" },
   { href: "/marketplace", icon: ShoppingBag, label: "Marketplace" },
-  { href: "/services", icon: Wrench, label: "Services" },
 ]
 
 export default function Navigation() {

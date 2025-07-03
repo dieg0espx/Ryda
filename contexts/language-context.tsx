@@ -19,7 +19,6 @@ const translations = {
     groups: "Groups",
     profile: "Profile",
     marketplace: "Marketplace",
-    services: "Services",
     settings: "Settings",
 
     // Routes
@@ -75,12 +74,12 @@ const translations = {
     myMotorcycles: "My Motorcycles",
     addMotorcycle: "Add Motorcycle",
 
-    // Marketplace
+    // Marketplace & Services
+    marketplaceAndServices: "Marketplace & Services",
     buyAndSell: "Buy and sell motorcycle gear and parts",
-    sellItem: "Sell Item",
-
-    // Service Providers
     findServiceProviders: "Find trusted motorcycle service providers",
+    sellItem: "Sell Item",
+    bookService: "Book Service",
 
     // Settings
     preferences: "Preferences",
@@ -100,7 +99,6 @@ const translations = {
     groups: "Grupos",
     profile: "Perfil",
     marketplace: "Mercado",
-    services: "Servicios",
     settings: "Configuración",
 
     // Routes
@@ -156,12 +154,12 @@ const translations = {
     myMotorcycles: "Mis Motocicletas",
     addMotorcycle: "Agregar Motocicleta",
 
-    // Marketplace
+    // Marketplace & Services
+    marketplaceAndServices: "Mercado y Servicios",
     buyAndSell: "Compra y vende equipo y repuestos de motocicleta",
-    sellItem: "Vender Artículo",
-
-    // Service Providers
     findServiceProviders: "Encuentra proveedores de servicio de motocicletas confiables",
+    sellItem: "Vender Artículo",
+    bookService: "Reservar Servicio",
 
     // Settings
     preferences: "Preferencias",

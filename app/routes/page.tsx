@@ -148,7 +148,7 @@ export default function RoutesPage() {
   return (
     <>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex">
+        <div className="flex">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
               <h1 className="text-3xl font-bold mb-2 text-black dark:text-white">{t("routes")}</h1>
