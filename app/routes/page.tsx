@@ -161,10 +161,10 @@ export default function RoutesPage() {
         {/* Route Filter Toggle */}
         <div className="mb-6">
           <div className="flex items-center justify-center">
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-full max-w-xs">
               <button
                 onClick={() => setFilterType("all")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex-1 ${
                   filterType === "all"
                     ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm"
                     : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
@@ -174,7 +174,7 @@ export default function RoutesPage() {
               </button>
               <button
                 onClick={() => setFilterType("my")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex-1 ${
                   filterType === "my"
                     ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm"
                     : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
