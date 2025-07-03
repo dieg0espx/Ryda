@@ -1,128 +1,49 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { MapPin, Calendar, Clock, Users, Star, X, Navigation, Route } from "lucide-react"
+import { MapPin, Calendar, Clock, Users, Star, X, Navigation, Route as RouteIcon } from "lucide-react"
 import { useLanguage } from "@/contexts/language-context"
-
-// Mock data for routes
-const routes = [
-  {
-    id: 1,
-    title: "Pacific Coast Highway Adventure",
-    description: "Scenic coastal ride through California's most beautiful landscapes",
-    difficulty: "Intermediate",
-    distance: "450 miles",
-    duration: "2 days",
-    startLocation: "San Francisco, CA",
-    endLocation: "Los Angeles, CA",
-    date: "2024-01-15",
-    time: "08:00 AM",
-    maxParticipants: 12,
-    currentParticipants: 8,
-    rating: 4.8,
-    creator: {
-      name: "Mike Rodriguez",
-      avatar: "/placeholder-user.jpg",
-      rating: 4.9,
-      ridesLed: 23,
-    },
-    meetingPoint: "Golden Gate Bridge Parking Area",
-    highlights: ["Big Sur coastline", "Hearst Castle", "Malibu beaches"],
-    requirements: ["Valid motorcycle license", "Highway riding experience", "Full tank of gas"],
-    participants: [
-      { name: "Sarah Johnson", avatar: "/placeholder-user.jpg", bike: "Harley Davidson" },
-      { name: "Tom Wilson", avatar: "/placeholder-user.jpg", bike: "BMW R1250GS" },
-      { name: "Lisa Chen", avatar: "/placeholder-user.jpg", bike: "Yamaha MT-07" },
-      { name: "David Brown", avatar: "/placeholder-user.jpg", bike: "Honda CB650R" },
-      { name: "Emma Davis", avatar: "/placeholder-user.jpg", bike: "Kawasaki Ninja" },
-      { name: "Alex Miller", avatar: "/placeholder-user.jpg", bike: "Ducati Monster" },
-      { name: "Rachel Green", avatar: "/placeholder-user.jpg", bike: "Triumph Street Triple" },
-      { name: "Chris Taylor", avatar: "/placeholder-user.jpg", bike: "Suzuki GSX-R" },
-    ],
-    mapImage: "/placeholder.svg?height=200&width=400&text=Route+Map",
-  },
-  {
-    id: 2,
-    title: "Mountain Pass Challenge",
-    description: "Thrilling ride through winding mountain roads",
-    difficulty: "Advanced",
-    distance: "280 miles",
-    duration: "1 day",
-    startLocation: "Denver, CO",
-    endLocation: "Aspen, CO",
-    date: "2024-01-20",
-    time: "07:00 AM",
-    maxParticipants: 8,
-    currentParticipants: 6,
-    rating: 4.9,
-    creator: {
-      name: "Jessica Martinez",
-      avatar: "/placeholder-user.jpg",
-      rating: 4.8,
-      ridesLed: 31,
-    },
-    meetingPoint: "REI Denver Flagship Store",
-    highlights: ["Rocky Mountain views", "Independence Pass", "Alpine scenery"],
-    requirements: ["Advanced riding skills", "Mountain riding experience", "Cold weather gear"],
-    participants: [
-      { name: "Mark Thompson", avatar: "/placeholder-user.jpg", bike: "BMW S1000RR" },
-      { name: "Jennifer Lee", avatar: "/placeholder-user.jpg", bike: "Aprilia RSV4" },
-      { name: "Robert Kim", avatar: "/placeholder-user.jpg", bike: "Yamaha R1" },
-      { name: "Amanda White", avatar: "/placeholder-user.jpg", bike: "Ducati Panigale" },
-      { name: "Steve Garcia", avatar: "/placeholder-user.jpg", bike: "Honda CBR1000RR" },
-      { name: "Nicole Adams", avatar: "/placeholder-user.jpg", bike: "Kawasaki ZX-10R" },
-    ],
-    mapImage: "/placeholder.svg?height=200&width=400&text=Mountain+Route",
-  },
-  {
-    id: 3,
-    title: "Desert Sunset Cruise",
-    description: "Relaxing evening ride through desert landscapes",
-    difficulty: "Beginner",
-    distance: "120 miles",
-    duration: "4 hours",
-    startLocation: "Phoenix, AZ",
-    endLocation: "Sedona, AZ",
-    date: "2024-01-25",
-    time: "03:00 PM",
-    maxParticipants: 15,
-    currentParticipants: 12,
-    rating: 4.6,
-    creator: {
-      name: "Carlos Mendez",
-      avatar: "/placeholder-user.jpg",
-      rating: 4.7,
-      ridesLed: 18,
-    },
-    meetingPoint: "Harley-Davidson of Scottsdale",
-    highlights: ["Red rock formations", "Desert sunset", "Scenic overlooks"],
-    requirements: ["Basic riding skills", "Sun protection", "Water bottle"],
-    participants: [
-      { name: "Maria Gonzalez", avatar: "/placeholder-user.jpg", bike: "Indian Scout" },
-      { name: "John Anderson", avatar: "/placeholder-user.jpg", bike: "Harley Street Glide" },
-      { name: "Patricia Moore", avatar: "/placeholder-user.jpg", bike: "Honda Rebel" },
-      { name: "Kevin Clark", avatar: "/placeholder-user.jpg", bike: "Yamaha Bolt" },
-      { name: "Linda Rodriguez", avatar: "/placeholder-user.jpg", bike: "Kawasaki Vulcan" },
-      { name: "Michael Lewis", avatar: "/placeholder-user.jpg", bike: "Suzuki Boulevard" },
-      { name: "Sandra Walker", avatar: "/placeholder-user.jpg", bike: "Victory Octane" },
-      { name: "Daniel Hall", avatar: "/placeholder-user.jpg", bike: "BMW R18" },
-      { name: "Karen Young", avatar: "/placeholder-user.jpg", bike: "Triumph Bonneville" },
-      { name: "Paul Allen", avatar: "/placeholder-user.jpg", bike: "Moto Guzzi V7" },
-      { name: "Nancy King", avatar: "/placeholder-user.jpg", bike: "Royal Enfield" },
-      { name: "Gary Wright", avatar: "/placeholder-user.jpg", bike: "Harley Iron 883" },
-    ],
-    mapImage: "/placeholder.svg?height=200&width=400&text=Desert+Route",
-  },
-]
+import { getRoutes, joinRoute, leaveRoute, type Route } from "@/lib/routes-storage"
+import { toast } from "sonner"
+import CreateRouteForm from "@/components/create-route-form"
 
 export default function RoutesPage() {
   const { t } = useLanguage()
-  const [selectedRoute, setSelectedRoute] = useState<(typeof routes)[0] | null>(null)
+  const [routes, setRoutes] = useState<Route[]>([])
+  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  // Load routes on component mount
+  useEffect(() => {
+    loadRoutes()
+  }, [])
+
+  const loadRoutes = () => {
+    try {
+      const loadedRoutes = getRoutes()
+      setRoutes(loadedRoutes)
+    } catch (error) {
+      console.error('Error loading routes:', error)
+      toast.error('Failed to load routes')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Refresh routes when selected route changes
+  useEffect(() => {
+    if (selectedRoute) {
+      const updatedRoute = routes.find(r => r.id === selectedRoute.id)
+      if (updatedRoute) {
+        setSelectedRoute(updatedRoute)
+      }
+    }
+  }, [routes, selectedRoute])
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -137,105 +58,190 @@ export default function RoutesPage() {
     }
   }
 
+  const handleJoinRoute = (routeId: number) => {
+    try {
+      // Mock user data - in a real app, this would come from authentication
+      const mockUser = {
+        name: "Test User",
+        avatar: "/placeholder-user.jpg",
+        bike: "Test Bike"
+      }
+
+      const success = joinRoute(routeId, mockUser)
+      if (success) {
+        // Refresh routes
+        const updatedRoutes = getRoutes()
+        setRoutes(updatedRoutes)
+        toast.success('Successfully joined the route!')
+      } else {
+        toast.error('Failed to join route. Route might be full.')
+      }
+    } catch (error) {
+      console.error('Error joining route:', error)
+      toast.error('Failed to join route')
+    }
+  }
+
+  const handleLeaveRoute = (routeId: number) => {
+    try {
+      const success = leaveRoute(routeId, "Test User")
+      if (success) {
+        // Refresh routes
+        const updatedRoutes = getRoutes()
+        setRoutes(updatedRoutes)
+        toast.success('Successfully left the route!')
+      } else {
+        toast.error('Failed to leave route.')
+      }
+    } catch (error) {
+      console.error('Error leaving route:', error)
+      toast.error('Failed to leave route')
+    }
+  }
+
+  const isUserInRoute = (route: Route) => {
+    return route.participants.some(p => p.name === "Test User")
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading routes...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-black dark:text-white">{t("routes")}</h1>
-        <p className="text-gray-600 dark:text-gray-400">{t("discover_scenic_routes")}</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 text-black dark:text-white">{t("routes")}</h1>
+            <p className="text-gray-600 dark:text-gray-400">{t("discover_scenic_routes")}</p>
+          </div>
+          <CreateRouteForm onRouteCreated={loadRoutes} />
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {routes.map((route) => (
-          <Card
-            key={route.id}
-            className="group cursor-pointer hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-600  overflow-hidden"
-            onClick={() => setSelectedRoute(route)}
-          >
-            {/* Route Image */}
-            <div className="relative h-48 ">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent border-b border-gray-200 dark:border-gray-800" />
-              <div className="absolute top-4 left-4">
-                <Badge className={`${getDifficultyColor(route.difficulty)} font-semibold`}>
-                  {route.difficulty}
-                </Badge>
+      {routes.length === 0 ? (
+        <div className="text-center py-12">
+          <RouteIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No routes available</h3>
+          <p className="text-gray-600 dark:text-gray-400">Check back later for new routes!</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {routes.map((route) => (
+            <Card
+              key={route.id}
+              className="group cursor-pointer hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-600  overflow-hidden"
+              onClick={() => setSelectedRoute(route)}
+            >
+              {/* Route Image */}
+              <div className="relative h-48 ">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent border-b border-gray-200 dark:border-gray-800" />
+                <div className="absolute top-4 left-4">
+                  <Badge className={`${getDifficultyColor(route.difficulty)} font-semibold`}>
+                    {route.difficulty}
+                  </Badge>
+                </div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-lg font-bold text-white mb-1">{route.title}</h3>
+                  <p className="text-sm text-white/90 line-clamp-2">{route.description}</p>
+                </div>
               </div>
-              {/* <div className="absolute top-4 right-4 flex items-center space-x-1 bg-white/90 dark:bg-gray-900/90 px-2 py-1 rounded-full">
-                <Star className="w-4 h-4 fill-orange-500 text-orange-500" />
-                <span className="text-sm font-medium text-black dark:text-white">{route.rating}</span>
-              </div> */}
-              <div className="absolute bottom-4 left-4 right-4">
-                <h3 className="text-lg font-bold text-white mb-1">{route.title}</h3>
-                <p className="text-sm text-white/90 line-clamp-2">{route.description}</p>
-              </div>
-            </div>
 
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                {/* Route Stats */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-2 text-sm">
-                    <MapPin className="w-4 h-4 text-orange-500" />
-                    <span className="text-gray-700 dark:text-gray-300">{route.distance}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm">
-                    <Clock className="w-4 h-4 text-orange-500" />
-                    <span className="text-gray-700 dark:text-gray-300">{route.duration}</span>
-                  </div>
-                </div>
-
-                {/* Date and Time */}
-                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Calendar className="w-4 h-4" />
-                  <span>{new Date(route.date).toLocaleDateString()}</span>
-                  <span className="ml-2">{route.time}</span>
-                </div>
-
-                {/* Route Locations */}
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-sm">
-                    <Navigation className="w-4 h-4 text-orange-500" />
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">From: {route.startLocation}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm">
-                    <MapPin className="w-4 h-4 text-orange-500" />
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">To: {route.endLocation}</span>
-                  </div>
-                </div>
-
-                {/* Creator and Participants */}
-                <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={route.creator.avatar || "/placeholder.svg"} />
-                      <AvatarFallback className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
-                        {route.creator.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-medium text-black dark:text-white">{route.creator.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{route.creator.ridesLed} rides led</p>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {/* Route Stats */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <MapPin className="w-4 h-4 text-orange-500" />
+                      <span className="text-gray-700 dark:text-gray-300">{route.distance}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Clock className="w-4 h-4 text-orange-500" />
+                      <span className="text-gray-700 dark:text-gray-300">{route.duration}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1 text-sm">
-                    <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">
-                      {route.currentParticipants}/{route.maxParticipants}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Join Button */}
-                <Button
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold"
-                  disabled={route.currentParticipants >= route.maxParticipants}
-                >
-                  {route.currentParticipants >= route.maxParticipants ? "Route Full" : "Join Route"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  {/* Date and Time */}
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                    <Calendar className="w-4 h-4" />
+                    <span>{new Date(route.date).toLocaleDateString()}</span>
+                    <span className="ml-2">{route.time}</span>
+                  </div>
+
+                  {/* Route Locations */}
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Navigation className="w-4 h-4 text-orange-500" />
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">From: {route.startLocation}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <MapPin className="w-4 h-4 text-orange-500" />
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">To: {route.endLocation}</span>
+                    </div>
+                  </div>
+
+                  {/* Creator and Participants */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={route.creator.avatar || "/placeholder.svg"} />
+                        <AvatarFallback className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+                          {route.creator.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium text-black dark:text-white">{route.creator.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{route.creator.ridesLed} rides led</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-1 text-sm">
+                      <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">
+                        {route.currentParticipants}/{route.maxParticipants}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Join/Leave Button */}
+                  <Button
+                    className={`w-full font-semibold ${
+                      isUserInRoute(route)
+                        ? "bg-red-500 hover:bg-red-600 text-white"
+                        : route.currentParticipants >= route.maxParticipants
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-orange-500 hover:bg-orange-600 text-white"
+                    }`}
+                    disabled={route.currentParticipants >= route.maxParticipants && !isUserInRoute(route)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (isUserInRoute(route)) {
+                        handleLeaveRoute(route.id)
+                      } else {
+                        handleJoinRoute(route.id)
+                      }
+                    }}
+                  >
+                    {route.currentParticipants >= route.maxParticipants && !isUserInRoute(route)
+                      ? "Route Full"
+                      : isUserInRoute(route)
+                      ? "Leave Route"
+                      : "Join Route"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Route Details Dialog - Mobile Optimized */}
       <Dialog open={!!selectedRoute} onOpenChange={() => setSelectedRoute(null)}>
@@ -248,22 +254,10 @@ export default function RoutesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 md:space-x-3 mb-2">
                       <Badge className={getDifficultyColor(selectedRoute.difficulty)}>{selectedRoute.difficulty}</Badge>
-                      {/* <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 fill-orange-500 text-orange-500" />
-                        <span className="font-medium text-black dark:text-white">{selectedRoute.rating}</span>
-                      </div> */}
                     </div>
                     <h2 className="text-lg md:text-xl lg:text-2xl mb-2 text-black dark:text-white font-bold truncate">{selectedRoute.title}</h2>
                     <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base line-clamp-2">{selectedRoute.description}</p>
                   </div>
-                  {/* <Button
-                    variant="ghost"
-                    size="icon"
-                    className="flex-shrink-0 ml-2 md:ml-4 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => setSelectedRoute(null)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button> */}
                 </div>
               </div>
 
@@ -423,10 +417,28 @@ export default function RoutesPage() {
               <div className="fixed bottom-0 left-0 right-0 p-4 pb-[110px] md:p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-black/80 backdrop-blur-sm md:relative md:flex-shrink-0">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold"
-                    disabled={selectedRoute.currentParticipants >= selectedRoute.maxParticipants}
+                    className={`flex-1 font-semibold ${
+                      isUserInRoute(selectedRoute)
+                        ? "bg-red-500 hover:bg-red-600 text-white"
+                        : selectedRoute.currentParticipants >= selectedRoute.maxParticipants
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-orange-500 hover:bg-orange-600 text-white"
+                    }`}
+                    disabled={selectedRoute.currentParticipants >= selectedRoute.maxParticipants && !isUserInRoute(selectedRoute)}
+                    onClick={() => {
+                      if (isUserInRoute(selectedRoute)) {
+                        handleLeaveRoute(selectedRoute.id)
+                        setSelectedRoute(null)
+                      } else {
+                        handleJoinRoute(selectedRoute.id)
+                      }
+                    }}
                   >
-                    {selectedRoute.currentParticipants >= selectedRoute.maxParticipants ? "Route Full" : "Join Route"}
+                    {selectedRoute.currentParticipants >= selectedRoute.maxParticipants && !isUserInRoute(selectedRoute)
+                      ? "Route Full"
+                      : isUserInRoute(selectedRoute)
+                      ? "Leave Route"
+                      : "Join Route"}
                   </Button>
                   <Button variant="outline" className="flex-1 bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Contact Organizer

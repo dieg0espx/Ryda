@@ -10,6 +10,7 @@ import Navigation from "@/components/navigation"
 import PWAInstaller from "@/components/pwa-installer"
 import TestUserInitializer from "@/components/test-user-initializer"
 import ThemeStatusBar from "@/components/theme-status-bar"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -80,6 +81,7 @@ export default function RootLayout({
             </LanguageProvider>
           </AuthProvider>
         </ThemeProvider>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   )
