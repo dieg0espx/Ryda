@@ -22,6 +22,9 @@ export default function RoutesPage() {
   const [joiningRouteId, setJoiningRouteId] = useState<number | null>(null)
   const [joinLoading, setJoinLoading] = useState(false)
   const [filterType, setFilterType] = useState<"all" | "my">("all")
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false)
+  const [leavingRouteId, setLeavingRouteId] = useState<number | null>(null)
+  const [leaveLoading, setLeaveLoading] = useState(false)
 
   // Load routes on component mount
   useEffect(() => {
@@ -60,8 +63,14 @@ export default function RoutesPage() {
 
   // Filter routes based on selection
   const filteredRoutes = routes.filter(route => {
-    if (filterType === "all") return true
-    if (filterType === "my") return isUserInRoute(route)
+    if (filterType === "all") {
+      // In "All Routes", exclude routes that the user has joined
+      return !isUserInRoute(route)
+    }
+    if (filterType === "my") {
+      // In "My Routes", only show routes that the user has joined
+      return isUserInRoute(route)
+    }
     return true
   })
 
@@ -116,19 +125,31 @@ export default function RoutesPage() {
   }
 
   const handleLeaveRoute = (routeId: number) => {
+    setLeavingRouteId(routeId)
+    setLeaveDialogOpen(true)
+  }
+
+  const handleLeaveConfirm = () => {
+    if (!leavingRouteId) return
+
+    setLeaveLoading(true)
     try {
-      const success = leaveRoute(routeId, "Test User")
+      const success = leaveRoute(leavingRouteId, "Test User")
       if (success) {
         // Refresh routes
         const updatedRoutes = getRoutes()
         setRoutes(updatedRoutes)
         toast.success('Successfully left the route!')
+        setLeaveDialogOpen(false)
+        setLeavingRouteId(null)
       } else {
         toast.error('Failed to leave route.')
       }
     } catch (error) {
       console.error('Error leaving route:', error)
       toast.error('Failed to leave route')
+    } finally {
+      setLeaveLoading(false)
     }
   }
 
@@ -337,6 +358,93 @@ export default function RoutesPage() {
         onJoin={handleJoinSubmit}
         loading={joinLoading}
       />
+
+      {/* Leave Route Confirmation Dialog */}
+      {leaveDialogOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-200 ${
+              leaveDialogOpen ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={() => {
+              setLeaveDialogOpen(false)
+              setLeavingRouteId(null)
+            }}
+          />
+          
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <div 
+              className={`w-full bg-white rounded-t-2xl shadow-2xl transition-transform duration-200 ease-out ${
+                leaveDialogOpen ? 'translate-y-0' : 'translate-y-full'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Handle bar */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-12 h-1 bg-gray-300 rounded-full" />
+              </div>
+
+              {/* Header */}
+              <div className="px-6 pb-4 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                    <X className="w-5 h-5 text-red-500" />
+                    Leave Route
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setLeaveDialogOpen(false)
+                      setLeavingRouteId(null)
+                    }}
+                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="px-6 py-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <X className="w-8 h-8 text-red-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Leave Route?</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    Are you sure you want to leave this route? This action cannot be undone.
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setLeaveDialogOpen(false)
+                      setLeavingRouteId(null)
+                    }}
+                    disabled={leaveLoading}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleLeaveConfirm}
+                    disabled={leaveLoading}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    {leaveLoading ? "Leaving..." : "Leave Route"}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Bottom safe area for devices with home indicator and bottom navigation */}
+              <div className="h-[100px]" />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Route Details Dialog - Mobile Optimized */}
       {selectedRoute && (
