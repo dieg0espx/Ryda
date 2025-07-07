@@ -8,8 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Upload, Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
 const countries = [
@@ -39,7 +38,6 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
-  const [profilePicture, setProfilePicture] = useState("")
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -97,32 +95,20 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       const success = await signup({
         name: signupData.name,
         email: signupData.email,
-        phone: signupData.phone,
-        country: signupData.country,
-        profilePicture: profilePicture || "/placeholder-user.jpg",
+        phone: signupData.phone || undefined,
+        country: signupData.country || undefined,
         password: signupData.password,
       })
 
       if (success) {
         onSuccess()
       } else {
-        setError("Email already exists")
+        setError("Email already exists or signup failed")
       }
     } catch (err) {
       setError("Signup failed. Please try again.")
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setProfilePicture(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -196,29 +182,6 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
           {/* Signup Tab */}
           <TabsContent value="signup" className="space-y-6">
             <form onSubmit={handleSignup} className="space-y-4">
-              {/* Profile Picture */}
-              <div className="flex flex-col items-center space-y-3">
-                <Avatar className="w-20 h-20 border-2 border-border">
-                  <AvatarImage src={profilePicture || "/placeholder.svg"} />
-                  <AvatarFallback className="bg-muted">
-                    <Upload className="w-8 h-8 text-muted-foreground" />
-                  </AvatarFallback>
-                </Avatar>
-                <Label
-                  htmlFor="profile-picture"
-                  className="cursor-pointer text-sm text-orange-600 hover:text-orange-700 font-medium"
-                >
-                  Upload Profile Picture
-                </Label>
-                <Input
-                  id="profile-picture"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleProfilePictureUpload}
-                />
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="signup-name" className="text-sm font-medium">Full Name</Label>
                 <Input
@@ -246,7 +209,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="signup-phone" className="text-sm font-medium">Phone Number</Label>
+                <Label htmlFor="signup-phone" className="text-sm font-medium">Phone Number (Optional)</Label>
                 <Input
                   id="signup-phone"
                   type="tel"
@@ -254,12 +217,11 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
                   value={signupData.phone}
                   onChange={(e) => setSignupData({ ...signupData, phone: e.target.value })}
                   className="h-12"
-                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="signup-country" className="text-sm font-medium">Country</Label>
+                <Label htmlFor="signup-country" className="text-sm font-medium">Country (Optional)</Label>
                 <Select
                   value={signupData.country}
                   onValueChange={(value) => setSignupData({ ...signupData, country: value })}
@@ -283,7 +245,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
                   <Input
                     id="signup-password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder="Create a password (min 6 characters)"
                     value={signupData.password}
                     onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                     className="h-12 pr-12"
