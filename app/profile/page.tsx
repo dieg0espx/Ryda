@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Edit, Plus, MapPin, Calendar, Bike, Gauge, Camera, Trash2, Loader2, User, Settings } from "lucide-react"
+import { Edit, Plus, MapPin, Calendar, Bike, Gauge, Camera, Trash2, Loader2, User } from "lucide-react"
 import { useLanguage } from "@/contexts/language-context"
 import { useAuth } from "@/contexts/auth-context"
 import { useMotorcycles } from "@/hooks/use-motorcycles"
@@ -157,25 +157,24 @@ export default function ProfilePage() {
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-8">
       {/* Profile Section */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-t-lg">
+      <Card>
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <User className="h-6 w-6 text-blue-600" />
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">Profile</CardTitle>
+              <User className="h-5 w-5 text-orange-500" />
+              <CardTitle className="text-2xl font-semibold">Profile</CardTitle>
             </div>
             <Button 
-              variant="ghost" 
+              variant="outline" 
               size="sm" 
               onClick={() => setIsEditing(!isEditing)}
-              className="hover:bg-blue-100 dark:hover:bg-blue-900"
             >
               <Edit className="h-4 w-4 mr-2" />
               {isEditing ? "Cancel" : "Edit"}
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-8">
+        <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row items-start space-y-6 lg:space-y-0 lg:space-x-8">
             {/* Profile Picture */}
             <div className="flex-shrink-0">
@@ -193,7 +192,7 @@ export default function ProfilePage() {
               {isEditing ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Full Name</label>
+                    <label className="text-sm font-medium mb-2 block">Full Name</label>
                     <Input 
                       value={editForm.name}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
@@ -202,7 +201,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Location</label>
+                    <label className="text-sm font-medium mb-2 block">Location</label>
                     <Input 
                       value={editForm.location}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
@@ -210,7 +209,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Bio</label>
+                    <label className="text-sm font-medium mb-2 block">Bio</label>
                     <Textarea 
                       value={editForm.bio}
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
@@ -219,7 +218,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className="flex space-x-3">
-                    <Button onClick={handleProfileSave} disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleProfileSave} disabled={isSaving}>
                       {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                       Save Changes
                     </Button>
@@ -231,26 +230,26 @@ export default function ProfilePage() {
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{profile?.name || "User"}</h2>
-                    <div className="flex items-center text-gray-600 dark:text-gray-400 mt-2">
+                    <h2 className="text-3xl font-bold">{profile?.name || "User"}</h2>
+                    <div className="flex items-center text-muted-foreground mt-2">
                       <MapPin className="h-4 w-4 mr-2" />
                       {profile?.country || "Location not set"}
                     </div>
                   </div>
                   <div>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed">
                       {profile?.bio || "No bio yet. Click edit to add your story."}
                     </p>
                   </div>
-                  <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2" />
                       Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "Unknown"}
                     </div>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <Badge variant="secondary">
                       {profile?.total_rides_led || 0} rides led
                     </Badge>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    <Badge variant="secondary">
                       {profile?.rating || 0} ⭐ rating
                     </Badge>
                   </div>
@@ -262,38 +261,37 @@ export default function ProfilePage() {
       </Card>
 
       {/* Motorcycles Section */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-t-lg">
+      <Card>
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Bike className="h-6 w-6 text-green-600" />
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">My Motorcycles</CardTitle>
+              <Bike className="h-5 w-5 text-orange-500" />
+              <CardTitle className="text-2xl font-semibold">My Motorcycles</CardTitle>
             </div>
             <Button 
               onClick={() => setShowAddBike(!showAddBike)}
-              className="bg-green-600 hover:bg-green-700"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Motorcycle
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-8">
+        <CardContent className="p-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
+              <p className="text-destructive text-sm">{error}</p>
             </div>
           )}
 
           {showAddBike && (
-            <Card className="mb-6 border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+            <Card className="mb-6 border">
               <CardHeader>
                 <CardTitle className="text-lg">Add New Motorcycle</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Brand</label>
+                    <label className="text-sm font-medium mb-2 block">Brand</label>
                     <Input 
                       placeholder="e.g., Honda, Yamaha, BMW"
                       value={bikeForm.brand}
@@ -301,7 +299,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Model</label>
+                    <label className="text-sm font-medium mb-2 block">Model</label>
                     <Input 
                       placeholder="e.g., CBR600RR, R1, S1000RR"
                       value={bikeForm.model}
@@ -309,7 +307,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Year</label>
+                    <label className="text-sm font-medium mb-2 block">Year</label>
                     <Input 
                       placeholder="e.g., 2023" 
                       type="number"
@@ -318,7 +316,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Mileage (km)</label>
+                    <label className="text-sm font-medium mb-2 block">Mileage (km)</label>
                     <Input 
                       placeholder="e.g., 5000" 
                       type="number"
@@ -327,7 +325,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Condition</label>
+                    <label className="text-sm font-medium mb-2 block">Condition</label>
                     <Select 
                       value={bikeForm.condition} 
                       onValueChange={(value: "excellent" | "good" | "fair" | "poor") => 
@@ -347,7 +345,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Description</label>
+                  <label className="text-sm font-medium mb-2 block">Description</label>
                   <Textarea 
                     placeholder="Tell us about your motorcycle..."
                     value={bikeForm.description}
@@ -359,7 +357,7 @@ export default function ProfilePage() {
                   <Button variant="outline" onClick={() => setShowAddBike(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleAddMotorcycle} disabled={isAddingBike} className="bg-green-600 hover:bg-green-700">
+                  <Button onClick={handleAddMotorcycle} disabled={isAddingBike}>
                     {isAddingBike ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                     Add Motorcycle
                   </Button>
@@ -370,14 +368,14 @@ export default function ProfilePage() {
 
           {loading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+              <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : motorcycles.length === 0 ? (
             <div className="text-center py-12">
-              <Bike className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">No motorcycles yet</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">Add your first motorcycle to get started</p>
-              <Button onClick={() => setShowAddBike(true)} className="bg-green-600 hover:bg-green-700">
+              <Bike className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No motorcycles yet</h3>
+              <p className="text-muted-foreground mb-6">Add your first motorcycle to get started</p>
+              <Button onClick={() => setShowAddBike(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Your First Motorcycle
               </Button>
@@ -385,7 +383,7 @@ export default function ProfilePage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {motorcycles.map((bike) => (
-                <Card key={bike.id} className="hover:shadow-lg transition-shadow duration-200">
+                <Card key={bike.id} className="hover:shadow-md transition-shadow duration-200">
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <MotorcycleImageUpload
@@ -400,39 +398,31 @@ export default function ProfilePage() {
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                            <h3 className="font-semibold text-lg">
                               {bike.brand} {bike.model}
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{bike.year}</p>
+                            <p className="text-sm text-muted-foreground">{bike.year}</p>
                           </div>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteMotorcycle(bike.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+                            className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center text-muted-foreground">
                             <Gauge className="h-4 w-4 mr-1" />
                             {bike.mileage.toLocaleString()} km
                           </div>
-                          <Badge 
-                            variant="outline" 
-                            className={`capitalize ${
-                              bike.condition === 'excellent' ? 'border-green-200 text-green-800 bg-green-50' :
-                              bike.condition === 'good' ? 'border-blue-200 text-blue-800 bg-blue-50' :
-                              bike.condition === 'fair' ? 'border-yellow-200 text-yellow-800 bg-yellow-50' :
-                              'border-red-200 text-red-800 bg-red-50'
-                            }`}
-                          >
+                          <Badge variant="outline" className="capitalize">
                             {bike.condition}
                           </Badge>
                         </div>
                         {bike.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{bike.description}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2">{bike.description}</p>
                         )}
                       </div>
                     </div>
