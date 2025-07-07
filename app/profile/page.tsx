@@ -1,438 +1,248 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Edit, Plus, MapPin, Calendar, Bike, Gauge, Camera, Trash2, Loader2, User } from "lucide-react"
-import { useLanguage } from "@/contexts/language-context"
-import { useAuth } from "@/contexts/auth-context"
-import { useMotorcycles } from "@/hooks/use-motorcycles"
-import ProfilePictureUpload from "@/components/profile-picture-upload"
-import MotorcycleImageUpload from "@/components/motorcycle-image-upload"
-import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { User, MapPin, Calendar, Bike, Settings, Edit } from "lucide-react"
+
+interface UserData {
+  name: string
+  email: string
+  avatar: string
+  location: string
+  joinDate: string
+  bio: string
+  stats: {
+    rides: number
+    routes: number
+    distance: string
+  }
+  badges: string[]
+}
 
 export default function ProfilePage() {
-  const { t } = useLanguage()
-  const { user, profile, updateProfile } = useAuth()
-  const { motorcycles, loading, error, addMotorcycle, deleteMotorcycle } = useMotorcycles()
-  
-  const [isEditing, setIsEditing] = useState(false)
-  const [showAddBike, setShowAddBike] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isAddingBike, setIsAddingBike] = useState(false)
-  
-  // Form states for profile editing
-  const [editForm, setEditForm] = useState({
-    name: profile?.name || "",
-    location: profile?.country || "",
-    bio: profile?.bio || "",
+  const [user] = useState<UserData>({
+    name: "John Doe",
+    email: "john.doe@example.com",
+    avatar: "/api/placeholder/150/150",
+    location: "San Francisco, CA",
+    joinDate: "March 2024",
+    bio: "Passionate motorcyclist and adventure seeker. Love exploring new routes and meeting fellow riders.",
+    stats: {
+      rides: 47,
+      routes: 12,
+      distance: "2,847 km"
+    },
+    badges: ["Early Adopter", "Route Creator", "Community Leader"]
   })
-  
-  // Form states for adding motorcycle
-  const [bikeForm, setBikeForm] = useState({
-    brand: "",
-    model: "",
-    year: "",
-    mileage: "",
-    condition: "good" as "excellent" | "good" | "fair" | "poor",
-    description: "",
-  })
-
-  // Handle profile save
-  const handleProfileSave = async () => {
-    if (!user) return
-    
-    setIsSaving(true)
-    try {
-      const success = await updateProfile({
-        name: editForm.name,
-        country: editForm.location,
-        bio: editForm.bio,
-      })
-      
-      if (success) {
-        toast.success("Profile updated successfully!")
-        setIsEditing(false)
-      } else {
-        toast.error("Failed to update profile")
-      }
-    } catch (error) {
-      toast.error("Error updating profile")
-      console.error(error)
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  // Handle profile picture update
-  const handleProfilePictureUpdate = async (imageUrl: string) => {
-    if (!user) return
-    
-    try {
-      const success = await updateProfile({
-        profile_picture: imageUrl,
-      })
-      
-      if (!success) {
-        toast.error("Failed to update profile picture in database")
-      }
-    } catch (error) {
-      console.error("Error updating profile picture:", error)
-      toast.error("Error updating profile picture")
-    }
-  }
-
-  // Handle adding motorcycle
-  const handleAddMotorcycle = async () => {
-    if (!user) return
-    
-    setIsAddingBike(true)
-    try {
-      await addMotorcycle({
-        brand: bikeForm.brand,
-        model: bikeForm.model,
-        year: parseInt(bikeForm.year),
-        mileage: parseInt(bikeForm.mileage),
-        condition: bikeForm.condition,
-        description: bikeForm.description || undefined,
-      })
-      
-      toast.success("Motorcycle added successfully!")
-      setShowAddBike(false)
-      setBikeForm({
-        brand: "",
-        model: "",
-        year: "",
-        mileage: "",
-        condition: "good",
-        description: "",
-      })
-    } catch (error) {
-      toast.error("Failed to add motorcycle")
-      console.error(error)
-    } finally {
-      setIsAddingBike(false)
-    }
-  }
-
-  // Handle deleting motorcycle
-  const handleDeleteMotorcycle = async (id: string) => {
-    try {
-      await deleteMotorcycle(id)
-      toast.success("Motorcycle deleted successfully!")
-    } catch (error) {
-      toast.error("Failed to delete motorcycle")
-      console.error(error)
-    }
-  }
-
-  // Update edit form when profile changes
-  useEffect(() => {
-    if (profile) {
-      setEditForm({
-        name: profile.name,
-        location: profile.country || "",
-        bio: profile.bio || "",
-      })
-    }
-  }, [profile])
-
-  if (!user) {
-    return (
-      <div className="max-w-6xl mx-auto p-4">
-        <div className="text-center py-12">
-          <Bike className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Please log in to view your profile</h3>
-          <p className="text-muted-foreground">Sign in to access your profile and manage your motorcycles</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 space-y-8">
-      {/* Profile Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <User className="h-5 w-5 text-orange-500" />
-              <CardTitle className="text-2xl font-semibold">Profile</CardTitle>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              {isEditing ? "Cancel" : "Edit"}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row items-start space-y-6 lg:space-y-0 lg:space-x-8">
-            {/* Profile Picture */}
-            <div className="flex-shrink-0">
-              <ProfilePictureUpload
-                currentImageUrl={profile?.profile_picture}
-                userId={user.id}
-                userName={profile?.name || "User"}
-                onImageUpdate={handleProfilePictureUpdate}
-                showRemoveButton={false}
-              />
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="max-w-4xl mx-auto p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+            Profile
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400">
+            Manage your account and view your riding statistics
+          </p>
+        </div>
 
-            {/* Profile Info */}
-            <div className="flex-1 space-y-6">
-              {isEditing ? (
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Full Name</label>
-                    <Input 
-                      value={editForm.name}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Enter your full name"
-                      className="text-lg"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Location</label>
-                    <Input 
-                      value={editForm.location}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
-                      placeholder="Enter your location"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Bio</label>
-                    <Textarea 
-                      value={editForm.bio}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
-                      placeholder="Tell us about yourself..."
-                      rows={4}
-                    />
-                  </div>
-                  <div className="flex space-x-3">
-                    <Button onClick={handleProfileSave} disabled={isSaving}>
-                      {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                      Save Changes
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-3xl font-bold">{profile?.name || "User"}</h2>
-                    <div className="flex items-center text-muted-foreground mt-2">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      {profile?.country || "Location not set"}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {profile?.bio || "No bio yet. Click edit to add your story."}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "Unknown"}
-                    </div>
-                    <Badge variant="secondary">
-                      {profile?.total_rides_led || 0} rides led
-                    </Badge>
-                    <Badge variant="secondary">
-                      {profile?.rating || 0} ⭐ rating
-                    </Badge>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Motorcycles Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Bike className="h-5 w-5 text-orange-500" />
-              <CardTitle className="text-2xl font-semibold">My Motorcycles</CardTitle>
-            </div>
-            <Button 
-              onClick={() => setShowAddBike(!showAddBike)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Motorcycle
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-6">
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
-              <p className="text-destructive text-sm">{error}</p>
-            </div>
-          )}
-
-          {showAddBike && (
-            <Card className="mb-6 border">
-              <CardHeader>
-                <CardTitle className="text-lg">Add New Motorcycle</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Brand</label>
-                    <Input 
-                      placeholder="e.g., Honda, Yamaha, BMW"
-                      value={bikeForm.brand}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBikeForm(prev => ({ ...prev, brand: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Model</label>
-                    <Input 
-                      placeholder="e.g., CBR600RR, R1, S1000RR"
-                      value={bikeForm.model}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBikeForm(prev => ({ ...prev, model: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Year</label>
-                    <Input 
-                      placeholder="e.g., 2023" 
-                      type="number"
-                      value={bikeForm.year}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBikeForm(prev => ({ ...prev, year: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Mileage (km)</label>
-                    <Input 
-                      placeholder="e.g., 5000" 
-                      type="number"
-                      value={bikeForm.mileage}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBikeForm(prev => ({ ...prev, mileage: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Condition</label>
-                    <Select 
-                      value={bikeForm.condition} 
-                      onValueChange={(value: "excellent" | "good" | "fair" | "poor") => 
-                        setBikeForm(prev => ({ ...prev, condition: value }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select condition" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="excellent">Excellent</SelectItem>
-                        <SelectItem value="good">Good</SelectItem>
-                        <SelectItem value="fair">Fair</SelectItem>
-                        <SelectItem value="poor">Poor</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Description</label>
-                  <Textarea 
-                    placeholder="Tell us about your motorcycle..."
-                    value={bikeForm.description}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setBikeForm(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
-                <div className="flex justify-end space-x-3">
-                  <Button variant="outline" onClick={() => setShowAddBike(false)}>
-                    Cancel
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* Profile Card */}
+          <div className="md:col-span-1">
+            <Card className="sticky top-6">
+              <CardHeader className="text-center pb-4">
+                <div className="relative mx-auto mb-4">
+                  <Avatar className="w-32 h-32 rounded-full overflow-hidden border-4 border-orange-100 shadow-lg mx-auto">
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback className="text-lg">
+                      {user.name.split(' ').map((n: string) => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
+                  >
+                    <Edit className="h-4 w-4" />
                   </Button>
-                  <Button onClick={handleAddMotorcycle} disabled={isAddingBike}>
-                    {isAddingBike ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Add Motorcycle
+                </div>
+                <CardTitle className="text-xl">{user.name}</CardTitle>
+                <CardDescription className="text-sm">{user.email}</CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <MapPin className="h-4 w-4" />
+                  <span>{user.location}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <Calendar className="h-4 w-4" />
+                  <span>Member since {user.joinDate}</span>
+                </div>
+                
+                <Separator />
+                
+                <div>
+                  <h4 className="font-medium mb-2">Bio</h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {user.bio}
+                  </p>
+                </div>
+                
+                <Separator />
+                
+                <div>
+                  <h4 className="font-medium mb-2">Badges</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {user.badges.map((badge: string, index: number) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {badge}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button className="w-full" variant="outline">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Stats and Content */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Statistics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bike className="h-5 w-5" />
+                  Riding Statistics
+                </CardTitle>
+                <CardDescription>
+                  Your riding activity and achievements
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                      {user.stats.rides}
+                    </div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      Total Rides
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                      {user.stats.routes}
+                    </div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      Routes Created
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                      {user.stats.distance}
+                    </div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      Distance Ridden
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Activity */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+                <CardDescription>
+                  Your latest rides and achievements
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <Bike className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">Completed Route: Pacific Coast Highway</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">
+                        2 days ago • 450 km
+                      </div>
+                    </div>
+                    <Badge variant="secondary">Completed</Badge>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                      <User className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">Joined New Group: Bay Area Riders</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">
+                        1 week ago
+                      </div>
+                    </div>
+                    <Badge variant="outline">New Member</Badge>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                      <MapPin className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">Created Route: Mountain Pass Adventure</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">
+                        2 weeks ago • 320 km
+                      </div>
+                    </div>
+                    <Badge variant="secondary">Route Creator</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+                <CardDescription>
+                  Common tasks and shortcuts
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button variant="outline" className="h-16 flex-col gap-2">
+                    <Bike className="h-5 w-5" />
+                    <span>Start New Ride</span>
+                  </Button>
+                  <Button variant="outline" className="h-16 flex-col gap-2">
+                    <MapPin className="h-5 w-5" />
+                    <span>Create Route</span>
+                  </Button>
+                  <Button variant="outline" className="h-16 flex-col gap-2">
+                    <User className="h-5 w-5" />
+                    <span>Find Riders</span>
+                  </Button>
+                  <Button variant="outline" className="h-16 flex-col gap-2">
+                    <Settings className="h-5 w-5" />
+                    <span>Settings</span>
                   </Button>
                 </div>
               </CardContent>
             </Card>
-          )}
-
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-          ) : motorcycles.length === 0 ? (
-            <div className="text-center py-12">
-              <Bike className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No motorcycles yet</h3>
-              <p className="text-muted-foreground mb-6">Add your first motorcycle to get started</p>
-              <Button onClick={() => setShowAddBike(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Motorcycle
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {motorcycles.map((bike) => (
-                <Card key={bike.id} className="hover:shadow-md transition-shadow duration-200">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <MotorcycleImageUpload
-                        motorcycleId={bike.id}
-                        currentImageUrl={bike.image_url}
-                        onImageUpdate={(imageUrl) => {
-                          // Update the motorcycle with the new image URL
-                          // This would need to be implemented in the useMotorcycles hook
-                          toast.success('Motorcycle image updated!')
-                        }}
-                      />
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-semibold text-lg">
-                              {bike.brand} {bike.model}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">{bike.year}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteMotorcycle(bike.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center text-muted-foreground">
-                            <Gauge className="h-4 w-4 mr-1" />
-                            {bike.mileage.toLocaleString()} km
-                          </div>
-                          <Badge variant="outline" className="capitalize">
-                            {bike.condition}
-                          </Badge>
-                        </div>
-                        {bike.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">{bike.description}</p>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
