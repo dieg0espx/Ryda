@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 
 const BUCKET_NAME = 'profile-pictures'
+const MOTORCYCLE_BUCKET_NAME = 'motorcycle-images'
 
 // Upload profile picture
 export async function uploadProfilePicture(file: File, userId: string): Promise<string | null> {
@@ -40,6 +41,48 @@ export async function uploadProfilePicture(file: File, userId: string): Promise<
     return urlData.publicUrl
   } catch (error) {
     console.error('❌ Error in uploadProfilePicture:', error)
+    return null
+  }
+}
+
+// Upload motorcycle image
+export async function uploadMotorcycleImage(file: File, motorcycleId: string): Promise<string | null> {
+  try {
+    console.log('🚀 Starting motorcycle image upload...')
+    console.log('📁 File details:', { name: file.name, size: file.size, type: file.type })
+    console.log('🏍️ Motorcycle ID:', motorcycleId)
+    
+    // Generate unique filename
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${motorcycleId}-${Date.now()}.${fileExt}`
+    console.log('📝 Generated filename:', fileName)
+    
+    // Upload file
+    console.log('☁️ Starting file upload...')
+    const { data, error } = await supabase.storage
+      .from(MOTORCYCLE_BUCKET_NAME)
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+    
+    if (error) {
+      console.error('❌ Upload error:', error)
+      return null
+    }
+    
+    console.log('✅ File uploaded successfully:', data)
+    
+    // Get public URL
+    console.log('🔗 Getting public URL...')
+    const { data: urlData } = supabase.storage
+      .from(MOTORCYCLE_BUCKET_NAME)
+      .getPublicUrl(fileName)
+    
+    console.log('✅ Public URL obtained:', urlData.publicUrl)
+    return urlData.publicUrl
+  } catch (error) {
+    console.error('❌ Error in uploadMotorcycleImage:', error)
     return null
   }
 }
