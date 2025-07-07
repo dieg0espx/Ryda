@@ -42,26 +42,84 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    difficulty: "Beginner" as "Beginner" | "Intermediate" | "Advanced",
+    difficulty: "Intermediate" as "Beginner" | "Intermediate" | "Advanced",
     distance: "",
     duration: "",
     startLocation: "",
     endLocation: "",
     date: "",
     time: "",
-    maxParticipants: 10,
+    maxParticipants: 8,
     meetingPoint: "",
     highlights: [""],
     requirements: [""],
+    image: null as File | null,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("Form submission started")
+    
+    // Validate required fields
+    const requiredFields = {
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      difficulty: formData.difficulty,
+      distance: formData.distance.trim(),
+      duration: formData.duration.trim(),
+      startLocation: formData.startLocation.trim(),
+      endLocation: formData.endLocation.trim(),
+      date: formData.date,
+      time: formData.time,
+      meetingPoint: formData.meetingPoint.trim(),
+    }
+
+    // Check if any required field is empty
+    const emptyFields = Object.entries(requiredFields).filter(([key, value]) => !value)
+    if (emptyFields.length > 0) {
+      toast.error(`Please fill in all required fields: ${emptyFields.map(([key]) => key).join(', ')}`)
+      return
+    }
+
+    // Validate max participants if not unlimited
+    if (!noMaxParticipants && formData.maxParticipants < 1) {
+      toast.error("Maximum participants must be at least 1")
+      return
+    }
+
     setLoading(true)
 
     try {
+      console.log("Starting route creation...")
+      console.log("Form data:", formData)
+      
+      // Handle image upload - convert to base64 for localStorage storage
+      let imageUrl = "/placeholder.svg?height=200&width=400&text=Route+Map"
+      
+      if (formData.image) {
+        console.log("Processing image:", formData.image.name, "Size:", formData.image.size)
+        
+        // Convert image to base64 for localStorage storage
+        const reader = new FileReader()
+        const imagePromise = new Promise<string>((resolve) => {
+          reader.onload = (e) => {
+            const result = e.target?.result as string
+            console.log("Image converted to base64, length:", result.length)
+            resolve(result)
+          }
+        })
+        
+        reader.readAsDataURL(formData.image)
+        imageUrl = await imagePromise
+      }
+
+      // Destructure formData to exclude the image field
+      const { image, ...routeDataWithoutImage } = formData
+      console.log("Route data without image:", routeDataWithoutImage)
+
+      console.log("About to call createRoute...")
       const newRoute = createRoute({
-        ...formData,
+        ...routeDataWithoutImage,
         maxParticipants: noMaxParticipants ? -1 : formData.maxParticipants,
         currentParticipants: 0,
         rating: 0,
@@ -72,18 +130,20 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
           ridesLed: 5,
         },
         participants: [],
-        mapImage: "/placeholder.svg?height=200&width=400&text=Route+Map",
+        mapImage: imageUrl,
       })
 
+      console.log("Route created successfully:", newRoute)
       toast.success("Route created successfully!")
       setOpen(false)
       resetForm()
       onRouteCreated()
     } catch (error) {
       console.error("Error creating route:", error)
-      toast.error("Failed to create route")
+      toast.error("Failed to create route. Please try again.")
     } finally {
       setLoading(false)
+      console.log("Form submission completed")
     }
   }
 
@@ -91,17 +151,18 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
     setFormData({
       title: "",
       description: "",
-      difficulty: "Beginner",
+      difficulty: "Intermediate" as "Beginner" | "Intermediate" | "Advanced",
       distance: "",
       duration: "",
       startLocation: "",
       endLocation: "",
       date: "",
       time: "",
-      maxParticipants: 10,
+      maxParticipants: 8,
       meetingPoint: "",
       highlights: [""],
       requirements: [""],
+      image: null,
     })
     setNoMaxParticipants(false)
     setCurrentStep(1)
@@ -175,7 +236,6 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Enter a catchy title for your route"
-                  required
                 />
               </div>
               <div>
@@ -186,8 +246,36 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe what makes this route special"
                   rows={3}
-                  required
                 />
+              </div>
+              <div>
+                <Label htmlFor="image">Route Image</Label>
+                <div className="mt-2">
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null
+                      setFormData(prev => ({ ...prev, image: file }))
+                    }}
+                    className="cursor-pointer"
+                  />
+                  {formData.image && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Selected: {formData.image.name}
+                      </p>
+                      <div className="mt-2 relative w-full h-32 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <img
+                          src={URL.createObjectURL(formData.image)}
+                          alt="Route preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -213,7 +301,6 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   value={formData.distance}
                   onChange={(e) => setFormData(prev => ({ ...prev, distance: e.target.value }))}
                   placeholder="e.g., 120 miles"
-                  required
                 />
               </div>
               <div>
@@ -223,7 +310,6 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   value={formData.duration}
                   onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
                   placeholder="e.g., 4 hours"
-                  required
                 />
               </div>
             </div>
@@ -237,7 +323,6 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   value={formData.startLocation}
                   onChange={(e) => setFormData(prev => ({ ...prev, startLocation: e.target.value }))}
                   placeholder="e.g., San Francisco, CA"
-                  required
                 />
               </div>
               <div>
@@ -247,7 +332,6 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                   value={formData.endLocation}
                   onChange={(e) => setFormData(prev => ({ ...prev, endLocation: e.target.value }))}
                   placeholder="e.g., Napa Valley, CA"
-                  required
                 />
               </div>
             </div>
@@ -258,25 +342,25 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
         return (
           <div className="space-y-6">
             {/* Timing and Participants */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="w-full">
                 <Label htmlFor="date">Date *</Label>
                 <Input
                   id="date"
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                  required
+                  className="w-full min-w-0"
                 />
               </div>
-              <div>
+              <div className="w-full">
                 <Label htmlFor="time">Time *</Label>
                 <Input
                   id="time"
                   type="time"
                   value={formData.time}
                   onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
-                  required
+                  className="w-full min-w-0"
                 />
               </div>
             </div>
@@ -288,7 +372,6 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                 value={formData.meetingPoint}
                 onChange={(e) => setFormData(prev => ({ ...prev, meetingPoint: e.target.value }))}
                 placeholder="e.g., Golden Gate Bridge Parking Area"
-                required
               />
             </div>
 
@@ -314,7 +397,6 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                     min="1"
                     value={formData.maxParticipants}
                     onChange={(e) => setFormData(prev => ({ ...prev, maxParticipants: parseInt(e.target.value) || 1 }))}
-                    required
                   />
                 </div>
               )}
@@ -536,7 +618,11 @@ export default function CreateRouteForm({ onRouteCreated }: CreateRouteFormProps
                 <ChevronRight className="w-4 h-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={loading} className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
+              >
                 {loading ? "Creating..." : "Create Route"}
               </Button>
             )}

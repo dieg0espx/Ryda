@@ -25,6 +25,20 @@ export interface Profile {
   updated_at: string
 }
 
+export interface Motorcycle {
+  id: string
+  user_id: string
+  brand: string
+  model: string
+  year: number
+  mileage: number
+  condition: 'excellent' | 'good' | 'fair' | 'poor'
+  description?: string
+  image_url?: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -32,6 +46,11 @@ export interface Database {
         Row: Profile
         Insert: Omit<Profile, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Omit<Profile, 'id' | 'created_at' | 'updated_at'>>
+      }
+      motorcycles: {
+        Row: Motorcycle
+        Insert: Omit<Motorcycle, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<Motorcycle, 'id' | 'created_at' | 'updated_at'>>
       }
     }
   }

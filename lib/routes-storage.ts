@@ -150,6 +150,7 @@ const getRoutesFromStorage = (): Route[] => {
   
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
+    console.log('Retrieved from localStorage:', stored ? 'data found' : 'no data, using initial routes')
     return stored ? JSON.parse(stored) : initialRoutes
   } catch (error) {
     console.error('Error reading routes from localStorage:', error)
@@ -161,7 +162,9 @@ const saveRoutesToStorage = (routes: Route[]): void => {
   if (typeof window === 'undefined') return
   
   try {
+    console.log('Saving routes to localStorage:', routes.length, 'routes')
     localStorage.setItem(STORAGE_KEY, JSON.stringify(routes))
+    console.log('Routes saved successfully to localStorage')
   } catch (error) {
     console.error('Error saving routes to localStorage:', error)
   }
@@ -178,13 +181,21 @@ export const getRouteById = (id: number): Route | undefined => {
 }
 
 export const createRoute = (routeData: Omit<Route, 'id'>): Route => {
+  console.log('createRoute called with data:', routeData)
+  
   const routes = getRoutesFromStorage()
+  console.log('Current routes in storage:', routes.length)
+  
   const newRoute: Route = {
     ...routeData,
     id: Math.max(...routes.map(r => r.id), 0) + 1
   }
   
+  console.log('New route created:', newRoute)
+  
   const updatedRoutes = [...routes, newRoute]
+  console.log('Updated routes array:', updatedRoutes.length, 'routes')
+  
   saveRoutesToStorage(updatedRoutes)
   return newRoute
 }
